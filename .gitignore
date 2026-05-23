@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment Variables (CRITICAL: Do not commit API keys!)
+.env
+.env.local
+.env.*.local
+
+# Virtual Environments
+venv/
+env/
+.venv/
+
+# Audio Files (Often too large for GitHub)
+*.mp3
+*.wav
+*.flac
+*.m4a
+*.ogg
+
+# Generated Transcripts & Output Files
+*_transcript.txt
+*_ground_truth.txt
+ami_long_ground_truth.txt
+
+# Editor / OS Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
