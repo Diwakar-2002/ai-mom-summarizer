@@ -24,6 +24,9 @@ env/
 *_transcript.txt
 *_ground_truth.txt
 ami_long_ground_truth.txt
+*.transcript.json
+*_offline_mom.txt
+chunks/
 
 # Editor / OS Files
 .vscode/
