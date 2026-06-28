@@ -33,3 +33,13 @@ chunks/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Ollama Binaries & CUDA Libraries
+bin/
+lib/
+
+# Local Datasets & Evaluation Runs
+data/
+results/
+meeting_output.txt
+

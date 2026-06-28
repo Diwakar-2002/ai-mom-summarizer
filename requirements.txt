@@ -2,3 +2,15 @@ assemblyai
 python-dotenv
 jiwer
 requests
+datasets
+evaluate
+rouge-score
+bert-score
+sentence-transformers
+summac
+transformers
+torch
+nltk
+pandas
+numpy
+tqdm
