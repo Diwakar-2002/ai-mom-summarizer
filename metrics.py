@@ -8,8 +8,21 @@ from nltk.translate.meteor_score import meteor_score
 from rouge_score import rouge_scorer
 import numpy as np
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+# Configure logging via named logger to allow silencing from the main runner
+import logging as syslog
+logger = syslog.getLogger("metrics")
+
+class LoggingAdapter:
+    def info(self, msg, *args, **kwargs):
+        logger.info(msg, *args, **kwargs)
+    def warning(self, msg, *args, **kwargs):
+        logger.warning(msg, *args, **kwargs)
+    def error(self, msg, *args, **kwargs):
+        logger.error(msg, *args, **kwargs)
+    def exception(self, msg, *args, **kwargs):
+        logger.exception(msg, *args, **kwargs)
+
+logging = LoggingAdapter()
 
 # Ensure NLTK resources are downloaded
 def download_nltk_resources():
@@ -132,8 +145,8 @@ def compute_semantic_cosine(reference: str, candidate: str) -> float:
     try:
         model = get_sentence_transformer()
         from sentence_transformers import util
-        ref_emb = model.encode(reference, convert_to_tensor=True)
-        cand_emb = model.encode(candidate, convert_to_tensor=True)
+        ref_emb = model.encode(reference, convert_to_tensor=True, show_progress_bar=False)
+        cand_emb = model.encode(candidate, convert_to_tensor=True, show_progress_bar=False)
         return float(util.cos_sim(ref_emb, cand_emb).item())
     except Exception as e:
         logging.warning(f"Semantic cosine computation failed: {e}")
@@ -244,8 +257,8 @@ def compute_action_item_metrics(ref_triples: list, cand_triples: list, threshold
         model = get_sentence_transformer()
         from sentence_transformers import util
         
-        ref_embs = model.encode(ref_actions, convert_to_tensor=True)
-        cand_embs = model.encode(cand_actions, convert_to_tensor=True)
+        ref_embs = model.encode(ref_actions, convert_to_tensor=True, show_progress_bar=False)
+        cand_embs = model.encode(cand_actions, convert_to_tensor=True, show_progress_bar=False)
         
         sim_matrix = util.cos_sim(cand_embs, ref_embs).cpu().numpy()
         
