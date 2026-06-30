@@ -7,7 +7,10 @@ from metrics import (
     compute_semantic_cosine,
     compute_factual_consistency,
     compute_compression_ratio,
-    compute_action_item_metrics
+    compute_action_item_metrics,
+    compute_wer,
+    compute_cer,
+    compute_normalized_wer
 )
 
 class TestMetrics(unittest.TestCase):
@@ -90,6 +93,35 @@ class TestMetrics(unittest.TestCase):
         
         scores = compute_action_item_metrics(ref, cand, threshold=0.6)
         self.assertGreaterEqual(scores["action_item_f1"], 0.8)
+
+    def test_compute_wer_cer(self):
+        ref = "The quick brown fox jumps over the lazy dog"
+        cand = "The quick brown fox jumps over the lazy dog"
+        self.assertAlmostEqual(compute_wer(ref, cand), 0.0)
+        self.assertAlmostEqual(compute_cer(ref, cand), 0.0)
+        self.assertAlmostEqual(compute_normalized_wer(ref, cand), 0.0)
+
+        # Test case/punctuation mismatch
+        ref = "The quick, brown fox jumps."
+        cand = "the quick brown fox jumps"
+        # Standard WER/CER will be > 0 because of capitalization and punctuation
+        self.assertGreater(compute_wer(ref, cand), 0.0)
+        self.assertGreater(compute_cer(ref, cand), 0.0)
+        # Normalized WER should be exactly 0.0
+        self.assertAlmostEqual(compute_normalized_wer(ref, cand), 0.0)
+
+        # Test completely different strings
+        ref = "apple banana cherry"
+        cand = "dog cat bird"
+        self.assertAlmostEqual(compute_wer(ref, cand), 1.0)
+        self.assertGreater(compute_cer(ref, cand), 0.5)
+
+        # Test empty input handling
+        self.assertEqual(compute_wer("", ""), 0.0)
+        self.assertEqual(compute_cer("", ""), 0.0)
+        self.assertEqual(compute_normalized_wer("", ""), 0.0)
+        self.assertEqual(compute_wer("hello", ""), 1.0)
+        self.assertEqual(compute_cer("hello", ""), 1.0)
 
 if __name__ == "__main__":
     unittest.main()

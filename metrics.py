@@ -296,3 +296,51 @@ def compute_action_item_metrics(ref_triples: list, cand_triples: list, threshold
             "action_item_recall": recall,
             "action_item_f1": f1
         }
+
+# 6. Transcription Error Metrics (WER/CER)
+def compute_wer(reference: str, hypothesis: str) -> float:
+    """Computes Word Error Rate (WER) between reference and hypothesis using jiwer."""
+    if not reference.strip() and not hypothesis.strip():
+        return 0.0
+    if not reference.strip():
+        return 1.0
+    import jiwer
+    try:
+        return float(jiwer.wer(reference, hypothesis))
+    except Exception as e:
+        logging.warning(f"WER calculation failed: {e}")
+        return 1.0
+
+def compute_cer(reference: str, hypothesis: str) -> float:
+    """Computes Character Error Rate (CER) between reference and hypothesis using jiwer."""
+    if not reference.strip() and not hypothesis.strip():
+        return 0.0
+    if not reference.strip():
+        return 1.0
+    import jiwer
+    try:
+        return float(jiwer.cer(reference, hypothesis))
+    except Exception as e:
+        logging.warning(f"CER calculation failed: {e}")
+        return 1.0
+
+def compute_normalized_wer(reference: str, hypothesis: str) -> float:
+    """Computes normalized Word Error Rate (lowercased, punctuation removed)."""
+    if not reference.strip() and not hypothesis.strip():
+        return 0.0
+    if not reference.strip():
+        return 1.0
+    import jiwer
+    try:
+        transformation = jiwer.Compose([
+            jiwer.ToLowerCase(),
+            jiwer.RemovePunctuation(),
+            jiwer.RemoveMultipleSpaces(),
+            jiwer.Strip(),
+            jiwer.ReduceToListOfListOfWords()
+        ])
+        return float(jiwer.wer(reference, hypothesis, reference_transform=transformation, hypothesis_transform=transformation))
+    except Exception as e:
+        logging.warning(f"Normalized WER calculation failed: {e}")
+        return 1.0
+

@@ -62,14 +62,30 @@ python3 eval_pipeline.py --n_samples 100
 ```
 *(You can scale this up to `--n_samples 200` as needed).*
 
+### Mode 3: End-to-End Audio Evaluation Mode
+To evaluate the pipeline end-to-end starting directly from meeting audio files (`huuuyeah/MeetingBank_Audio`):
+```bash
+python3 eval_audio_pipeline.py --n_samples 5 --model phi3
+```
+
+> [!IMPORTANT]
+> **API Credentials**: Audio evaluation requires transcription via AssemblyAI. You must set `ASSEMBLYAI_API_KEY` in your `.env` file.
+> 
+> **Ollama CPU Mode**: If running local summarization models (like `phi3`), ensure Ollama is serving on the CPU (e.g., via `CUDA_VISIBLE_DEVICES="" bin/ollama serve`) to avoid CUDA driver/library conflicts with PyTorch/BERTScore during evaluation.
+
+### AssemblyAI Cost & Drift Caveats
+*   **Cost Estimates**: AssemblyAI Universal-2 transcription costs approximately **$0.037 per minute** (~$2.20 per hour). The pipeline automatically crops audio files to segment boundaries locally using `soundfile` before uploading to AssemblyAI. This isolates costs to target evaluation windows, keeping the evaluation of 5 segments of ~5 minutes each under **$1.00** total.
+*   **Model Drift**: AssemblyAI is a cloud-hosted API where speech models can change or be upgraded server-side over time. Consequently, a WER/CER or downstream summary metric shift between two identical evaluation runs months apart may reflect an AssemblyAI system update rather than a regression in our local pipeline.
+
 ### Arguments
 
 | Argument | Description | Default |
 |---|---|---|
-| `--n_samples` | Number of samples to download and evaluate. | `100` |
+| `--n_samples` | Number of samples to download and evaluate. | `5` (audio) / `100` (text) |
 | `--model` | Model to generate candidate summaries (`phi3` or `gemini`). | `phi3` |
 | `--threshold` | Cosine similarity threshold for action item embedding matching. | `0.7` |
-| `--n_lead` | Number of sentences to take for the Lead-N baseline summary. | `3` |
+| `--n_lead` | Number of sentences to take for the Lead-N baseline summary (text pipeline only). | `3` |
+
 
 ---
 

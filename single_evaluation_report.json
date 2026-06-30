@@ -1,0 +1,23 @@
+{
+  "transcription": {
+    "wer": 0.18587047939444912,
+    "cer": 0.0833215247272212,
+    "normalized_wer": 0.09083263246425567,
+    "latency_seconds": 32.91362404823303
+  },
+  "summarization": {
+    "rouge1": 0.2572614107883818,
+    "rouge2": 0.08368200836820083,
+    "rougeL": 0.16597510373443983,
+    "bleu": 0.018960571476291616,
+    "meteor": 0.3731313848459749,
+    "bertscore_f1": 0.8543680906295776,
+    "semantic_cosine": 0.6095387935638428,
+    "factual_consistency": 0.588748129705588,
+    "factual_method": "nli_fallback",
+    "compression_ratio": 4.9251191286589515,
+    "action_item_precision": 0.0,
+    "action_item_recall": 0.0,
+    "action_item_f1": 0.0
+  }
+}
