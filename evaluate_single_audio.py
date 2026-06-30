@@ -286,7 +286,7 @@ Summary:
 def main():
     parser = argparse.ArgumentParser(description="Evaluate MOM Summarization and Transcription for a single MeetingBank clip.")
     parser.add_argument("--uid", type=str, default="SeattleCityCouncil_06132016_Res 31669", help="MeetingBank UID to evaluate.")
-    parser.add_argument("--model", type=str, default="phi3", choices=["phi3", "gemini"], help="Candidate summarizer model.")
+    parser.add_argument("--model", type=str, default="phi3", help="Candidate summarizer model (e.g., phi3, gemini, llama3, gemma).")
     parser.add_argument("--threshold", type=float, default=0.7, help="Action item match similarity threshold.")
     args = parser.parse_args()
 
