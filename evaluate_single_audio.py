@@ -461,18 +461,16 @@ def main():
         }
     }
     
-    # 8. Save structured JSON result file in root directory (both latest & versioned)
-    output_json_path = "single_evaluation_report.json"
+    # 8. Save structured JSON result file in root directory (versioned by item ID)
     versioned_json_path = f"single_evaluation_report_{clean_item_id}.json"
     
-    for path in [output_json_path, versioned_json_path]:
-        with open(path, 'w') as f:
-            json.dump(metrics, f, indent=2)
-    logging.info(f"Saved structured JSON metrics to: {output_json_path} & {versioned_json_path}")
+    with open(versioned_json_path, 'w') as f:
+        json.dump(metrics, f, indent=2)
+    logging.info(f"Saved structured JSON metrics to: {versioned_json_path}")
     
-    # 9. Save Markdown Report file in root directory (both latest & versioned)
-    output_report_path = "single_evaluation_report.md"
+    # 9. Save Markdown Report file in root directory (versioned by item ID)
     versioned_report_path = f"single_evaluation_report_{clean_item_id}.md"
+
     
     report_content = f"""# MOM Single Audio Clip Evaluation Report
 **Target Sample UID**: `{target_uid}`
@@ -538,17 +536,17 @@ def main():
 ### Full Model (AssemblyAI) Transcript
 {generated_transcript}
 """
-    for path in [output_report_path, versioned_report_path]:
-        with open(path, 'w') as f:
-            f.write(report_content)
+    with open(versioned_report_path, 'w') as f:
+        f.write(report_content)
         
-    logging.info(f"Saved Markdown report to: {output_report_path} & {versioned_report_path}")
+    logging.info(f"Saved Markdown report to: {versioned_report_path}")
     print("\n=======================================================")
     print("Single Audio Clip Evaluation Completed Successfully!")
     print(f"1. Audio Segment: {output_audio_path}")
-    print(f"2. Structured JSON Metrics: {output_json_path}")
-    print(f"3. Markdown Report: {output_report_path}")
+    print(f"2. Structured JSON Metrics: {versioned_json_path}")
+    print(f"3. Markdown Report: {versioned_report_path}")
     print("=======================================================\n")
+
 
 if __name__ == "__main__":
     main()
