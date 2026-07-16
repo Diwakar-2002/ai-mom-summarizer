@@ -16,3 +16,7 @@ numpy
 tqdm
 soundfile
 huggingface_hub
+chromadb
+fastapi
+uvicorn
+python-multipart

@@ -55,6 +55,12 @@ def main():
         default=None, 
         help="Truncate transcript to maximum words for LLM summary input"
     )
+    parser.add_argument(
+        "--model", 
+        type=str, 
+        default="phi3", 
+        help="Candidate summarizer model (e.g., phi3, gemini, llama3, gemma)"
+    )
     args = parser.parse_args()
     args.diarize = not args.no_diarize
 
@@ -103,12 +109,13 @@ def main():
 
         mom_output = None
         if args.summarize:
-            print(f"\nGenerating Meeting Summary locally using Ollama (phi3) with '{args.meeting_type}' prompt routing...")
+            print(f"\nGenerating Meeting Summary using '{args.model}' with '{args.meeting_type}' prompt routing...")
             try:
                 mom_output = generate_summary(
                     full_transcript_text, 
                     meeting_type=args.meeting_type,
-                    max_words=args.max_words
+                    max_words=args.max_words,
+                    model_name=args.model
                 )
                 
                 print("\n=== Minutes of Meeting (MoM) [Offline] ===")
@@ -145,7 +152,17 @@ def main():
                 
             print(f"\nSaved all results to single output file: {output_file}")
             
+        # Automatically save embeddings in ChromaDB
+        meeting_id = os.path.splitext(os.path.basename(args.audio_file))[0]
+        print(f"\nAutomatically saving meeting '{meeting_id}' to local ChromaDB database...")
+        try:
+            from rag_pipeline import store_meeting
+            store_meeting(meeting_id, full_transcript_text, mom_output)
+        except Exception as e:
+            print(f"Failed to save to ChromaDB: {e}")
+            
     except Exception as e:
+
         print(f"An error occurred: {e}")
 
 if __name__ == "__main__":

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOM Summarizer & Evaluation Suite</title>
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <!-- Apple-style Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                <i class="fa-solid fa-brain nav-logo-icon"></i>
+                <span>AI Minutes of Meeting Summarizer Assistant</span>
+            </a>
+            <div class="nav-links">
+                <a href="#transcribe-section" class="active nav-link" id="nav-btn-transcribe">Transcribe</a>
+                <a href="#chat-section" class="nav-link" id="nav-btn-chat">Meeting Brain (RAG)</a>
+                <a href="#evaluate-section" class="nav-link" id="nav-btn-evaluate">Evaluation Suite</a>
+            </div>
+            <div class="server-status" id="server-status">
+                <span class="status-indicator-dot red" id="status-dot"></span>
+                <span class="status-text" id="status-text">Checking Ollama...</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="main-content">
+
+        <!-- Tab 1: Transcribe & Summarize -->
+        <section id="transcribe-section" class="tab-panel active">
+            <!-- Hero Title Area -->
+            <div class="hero-section">
+                <h1 class="hero-title">Meeting Intelligence. <span class="gradient-text">Beautifully Simple.</span></h1>
+                <p class="hero-subtitle">Upload your recording. We'll transcribe speakers, extract key decisions, and
+                    compile structured Minutes of Meeting (MOM) in seconds.</p>
+            </div>
+
+            <!-- Upload Area -->
+            <div class="card upload-card">
+                <div class="upload-zone" id="drop-zone">
+                    <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                    <h3>Drag & drop meeting audio here</h3>
+                    <p class="upload-hint">Supports MP3, WAV, M4A up to 100MB</p>
+                    <button class="btn btn-secondary" id="browse-btn">
+                        <i class="fa-solid fa-folder-open"></i> Browse Files
+                    </button>
+                    <input type="file" id="audio-file-input" accept="audio/*" class="hidden-input">
+                </div>
+
+                <!-- Configure and Submit Deck -->
+                <div class="settings-grid">
+                    <div class="settings-control">
+                        <label for="meeting-type-select"><i class="fa-solid fa-sliders"></i> Meeting Type</label>
+                        <select id="meeting-type-select" class="form-select">
+                            <option value="general">General Meeting</option>
+                            <option value="stand_up">Daily Stand-up</option>
+                            <option value="creative">Creative Brainstorm</option>
+                            <option value="financial">Financial / Council Meeting</option>
+                            <option value="sales_pitch">Sales Pitch</option>
+                        </select>
+                    </div>
+
+                    <div class="settings-control">
+                        <label for="model-select"><i class="fa-solid fa-microchip"></i> Summarizer LLM</label>
+                        <select id="model-select" class="form-select">
+                            <option value="phi3" selected>Phi-3 (Local)</option>
+                            <option value="mistral">Mistral (Local)</option>
+                            <option value="llama3">Llama 3 (Local)</option>
+                            <option value="qwen2.5:7b">Qwen 2.5 (Local)</option>
+                            <option value="gemini">Gemini 2.5 Flash (Cloud)</option>
+                        </select>
+                    </div>
+
+                    <div class="settings-control checkbox-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="diarize-checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span>Speaker Diarization (Detect Speakers)</span>
+                    </div>
+                </div>
+
+                <div class="action-btn-container">
+                    <button class="btn btn-primary btn-large" id="process-audio-btn" disabled>
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Process Meeting Audio
+                    </button>
+                </div>
+
+                <!-- Progress / Loading Area -->
+                <div class="progress-container hidden" id="upload-progress-container">
+                    <div class="progress-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                    <div class="progress-details">
+                        <h4 id="progress-status-title">Uploading File...</h4>
+                        <p id="progress-status-desc">Communicating with the backend pipeline</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Display Side-by-Side Deck -->
+            <div class="output-grid hidden" id="transcribe-output-grid">
+                <!-- Transcript Card -->
+                <div class="card output-card">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-align-left header-icon"></i> Full Transcript</h2>
+                        <button class="btn btn-icon" onclick="copyText('transcript-content')" title="Copy Transcript">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="card-body scrollable-body" id="transcript-content">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <!-- MOM Summary Card -->
+                <div class="card output-card highlight-card">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-file-invoice header-icon"></i> Minutes of Meeting (MOM)</h2>
+                        <button class="btn btn-icon" onclick="copyText('summary-content')" title="Copy Summary">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="card-body scrollable-body markdown-body" id="summary-content">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Tab 2: RAG Meeting Brain (Chat) -->
+        <section id="chat-section" class="tab-panel">
+            <div class="hero-section">
+                <h1 class="hero-title">Talk to your <span class="gradient-text">Meeting Brain.</span></h1>
+                <p class="hero-subtitle">Ask questions, locate specific action items, or query decisions across your
+                    transcribed archives instantly.</p>
+            </div>
+
+            <div class="chat-wrapper">
+                <!-- Sidebar (List of ingested meetings) -->
+                <div class="card chat-sidebar">
+                    <div class="sidebar-header">
+                        <h3><i class="fa-solid fa-database"></i> Archives</h3>
+                    </div>
+                    <div class="meeting-list" id="meeting-list-container">
+                        <div class="empty-list-indicator">No meetings ingested yet. Upload an audio clip to begin.</div>
+                    </div>
+                </div>
+
+                <!-- Chat Box Card -->
+                <div class="card chat-container">
+                    <div class="chat-header">
+                        <div class="chat-active-info">
+                            <i class="fa-solid fa-comments chat-header-icon"></i>
+                            <div>
+                                <h3 id="active-meeting-name">All Archives</h3>
+                                <p class="subtext">Retrieving context using NLI semantic filters</p>
+                            </div>
+                        </div>
+                        <div class="chat-model-select">
+                            <select id="chat-model-select" class="form-select select-small">
+                                <option value="phi3" selected>Phi-3 (Local)</option>
+                                <option value="mistral">Mistral (Local)</option>
+                                <option value="llama3">Llama 3 (Local)</option>
+                                <option value="qwen2.5:7b">Qwen 2.5 (Local)</option>
+                                <option value="gemini">Gemini (Cloud)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Chat Message Area -->
+                    <div class="chat-messages" id="chat-messages-area">
+                        <div class="message system-message">
+                            <div class="message-bubble">
+                                Hello! Ask me anything about the ingested meeting transcripts. I'll search through
+                                ChromaDB and answer strictly based on the extracted context.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input Bar -->
+                    <div class="chat-input-bar">
+                        <input type="text" id="chat-input" placeholder="Ask a question about the meeting..." disabled>
+                        <button class="btn btn-primary" id="chat-send-btn" disabled>
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Tab 3: Evaluation Suite -->
+        <section id="evaluate-section" class="tab-panel">
+            <div class="hero-section">
+                <h1 class="hero-title">Accuracy & <span class="gradient-text">Evaluation Suite.</span></h1>
+                <p class="hero-subtitle">Compare transcription accuracy and summarization metrics against
+                    human-annotated ground truth splits using standard benchmarks.</p>
+            </div>
+
+            <!-- Run Evaluation Deck -->
+            <div class="card config-card">
+                <div class="settings-grid evaluation-grid">
+                    <div class="settings-control">
+                        <label for="eval-uid-input"><i class="fa-solid fa-hashtag"></i> MeetingBank UID</label>
+                        <input type="text" id="eval-uid-input" class="form-input"
+                            value="SeattleCityCouncil_06132016_Res 31669">
+                    </div>
+
+                    <div class="settings-control">
+                        <label for="eval-model-select"><i class="fa-solid fa-microchip"></i> Model to Benchmark</label>
+                        <select id="eval-model-select" class="form-select">
+                            <option value="phi3" selected>Phi-3 (Local)</option>
+                            <option value="mistral">Mistral (Local)</option>
+                            <option value="llama3">Llama 3 (Local)</option>
+                            <option value="qwen2.5:7b">Qwen 2.5 (Local)</option>
+                            <option value="gemini">Gemini 2.5 Flash (Cloud)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="action-btn-container">
+                    <button class="btn btn-accent btn-large" id="run-eval-btn">
+                        <i class="fa-solid fa-chart-line"></i> Run Benchmarks & Generate Report
+                    </button>
+                </div>
+
+                <!-- Evaluation Progress Indicator -->
+                <div class="progress-container hidden" id="eval-progress-container">
+                    <div class="progress-spinner">
+                        <div class="spinner spinner-accent"></div>
+                    </div>
+                    <div class="progress-details">
+                        <h4 id="eval-progress-title">Running evaluation metrics...</h4>
+                        <p id="eval-progress-desc">This may take up to 2-3 minutes (AssemblyAI transcription + LLM
+                            generation)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Comparison Grid -->
+            <div class="evaluation-results-deck hidden" id="eval-results-container">
+                <!-- Summary Metrics Dashboard Card -->
+                <div class="metrics-grid">
+                    <!-- Metric Card 1: WER -->
+                    <div class="card metric-card">
+                        <div class="metric-header">
+                            <span>WER (Word Error Rate)</span>
+                            <i class="fa-solid fa-microphone"></i>
+                        </div>
+                        <div class="metric-value" id="metric-wer">0.00%</div>
+                        <div class="metric-footer text-green">Lower is better</div>
+                    </div>
+
+                    <!-- Metric Card 2: ROUGE-L -->
+                    <div class="card metric-card">
+                        <div class="metric-header">
+                            <span>ROUGE-L Score</span>
+                            <i class="fa-solid fa-copy"></i>
+                        </div>
+                        <div class="metric-value" id="metric-rouge">0.00</div>
+                        <div class="metric-footer text-blue">Higher is better</div>
+                    </div>
+
+                    <!-- Metric Card 3: BERTScore -->
+                    <div class="card metric-card">
+                        <div class="metric-header">
+                            <span>BERTScore F1</span>
+                            <i class="fa-solid fa-circle-nodes"></i>
+                        </div>
+                        <div class="metric-value" id="metric-bert">0.0000</div>
+                        <div class="metric-footer text-blue">Higher is better</div>
+                    </div>
+
+                    <!-- Metric Card 4: Factual Consistency -->
+                    <div class="card metric-card">
+                        <div class="metric-header">
+                            <span>Factual Entailment</span>
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div class="metric-value" id="metric-factual">0.0000</div>
+                        <div class="metric-footer text-green">Zero-shot NLI fallback</div>
+                    </div>
+                </div>
+
+                <!-- Comprehensive Metrics Table Card -->
+                <div class="card table-card">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-list-check"></i> Benchmark Metrics Detail</h2>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="metrics-table">
+                            <thead>
+                                <tr>
+                                    <th>Benchmark Layer</th>
+                                    <th>Metric Description</th>
+                                    <th>Measured Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="metrics-table-body">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Markdown Report Card -->
+                <div class="card report-card">
+                    <div class="card-header">
+                        <h2><i class="fa-regular fa-file-lines"></i> Interactive Evaluation Report</h2>
+                        <button class="btn btn-secondary btn-small" onclick="copyText('report-md-container')">
+                            <i class="fa-regular fa-copy"></i> Copy Markdown
+                        </button>
+                    </div>
+                    <div class="card-body scrollable-body markdown-body" id="report-md-container">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Notification Toast -->
+    <div class="toast hidden" id="toast-notification">
+        <i class="fa-solid fa-circle-check toast-icon" id="toast-icon"></i>
+        <span id="toast-message">MOM Generated Successfully!</span>
+    </div>
+
+    <!-- Script loading -->
+    <script src="/static/app.js"></script>
+</body>
+
+</html>

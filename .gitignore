@@ -42,4 +42,7 @@ lib/
 data/
 results/
 meeting_output.txt
-
+meeting2_output.txt
+single_evaluation_report_*
+meeting_db/
+*.log
